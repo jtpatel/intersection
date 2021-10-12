@@ -163,32 +163,32 @@ bool CheckCollision(Shape * subject, Shape * target)
 	//between circle - Vehicle
 	if (subAsCircle && tarAsVehicle)
 	{
-		for (int i = 0; i < tarAsVehicle->objects.size(); i++)
-			if (subAsCircle->intersect(tarAsVehicle->objects.at(i).get()))
+		for (const auto& obj : tarAsVehicle->objects)
+			if (subAsCircle->intersect(obj.get()))
 				return true;
 	}
 
 	//between Vehicle - circle
 	if (subAsVehicle && tarAsCircle)
 	{
-		for (int i = 0; i < subAsVehicle->objects.size(); i++)
-			if (tarAsCircle->intersect(subAsVehicle->objects.at(i).get()))
+		for (const auto& obj : subAsVehicle->objects)
+			if (tarAsCircle->intersect(obj.get()))
 				return true;
 	}
 
 	//between rectangle - Vehicle
 	if (subAsRect && tarAsVehicle)
 	{
-		for (int i = 0; i < tarAsVehicle->objects.size(); i++)
-			if (subAsRect->intersect(tarAsVehicle->objects.at(i).get()))
+		for (const auto& obj : tarAsVehicle->objects)
+			if (subAsRect->intersect(obj.get()))
 				return true;
 	}
 
 	//between Vehicle - rectangle
 	if (subAsVehicle && tarAsRect)
 	{
-		for (int i = 0; i < subAsVehicle->objects.size(); i++)
-			if (tarAsRect->intersect(subAsVehicle->objects.at(i).get()))
+		for (const auto& obj : subAsVehicle->objects)
+			if (tarAsRect->intersect(obj.get()))
 				return true;
 	}
 
@@ -222,14 +222,14 @@ bool Vehicle::intersect(Shape * target)
 int main()
 {
 	Vehicle v1{ "A" };
-	v1.objects.emplace_back(new Circle(0.0, 0.0, 3.0));
-	v1.objects.emplace_back(new Circle(10.0, 0.0, 3.0));
-	v1.objects.emplace_back(new Rectangle(5.0, 3.0, 10.0, 6.0));
+	v1.objects.emplace_back(std::make_unique<Circle>(0.0, 0.0, 3.0));
+	v1.objects.emplace_back(std::make_unique<Circle>(10.0, 0.0, 3.0));
+	v1.objects.emplace_back(std::make_unique<Rectangle>(5.0, 3.0, 10.0, 6.0));
 
 	Vehicle v2{ "B" };
-	v2.objects.emplace_back(new Circle(0.0, 10.0, 3.0));
-	v2.objects.emplace_back(new Circle(10.0, 10.0, 3.0));
-	v2.objects.emplace_back(new Rectangle(5.0, 13.0, 10.0, 6.0));
+	v2.objects.emplace_back(std::make_unique<Circle>(0.0, 10.0, 3.0));
+	v2.objects.emplace_back(std::make_unique<Circle>(10.0, 10.0, 3.0));
+	v2.objects.emplace_back(std::make_unique<Rectangle>(5.0, 13.0, 10.0, 6.0));
 
 	bool result = v1.intersect(&v2);
 

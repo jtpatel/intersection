@@ -96,6 +96,7 @@ bool CheckIntersection(Circle * icircle, Rectangle * irect)
 	{ car_x - halfwidth, car_y + halfheight },
 	{ car_x + halfwidth, car_y - halfheight },
 	{ car_x + halfwidth, car_y + halfheight },
+	{ car_x , car_y },
 	};
 
 	for (const auto [corner_x, corner_y] : corners)
@@ -240,36 +241,48 @@ int main()
 {
 	Vehicle v1;
 	v1.SetName("A");
-	v1.objects.emplace_back(std::make_unique<Circle>(0.0, 0.0, 3.0));
-	v1.objects.emplace_back(std::make_unique<Circle>(10.0, 0.0, 3.0));
-	v1.objects.emplace_back(std::make_unique<Rectangle>(5.0, 3.0, 10.0, 6.0));
+	v1.objects.emplace_back(std::make_unique<Rectangle>(1.5, 0.0, 3.0, 6.0));
 
 	Vehicle v2;
 	v2.SetName("B");
-	v2.objects.emplace_back(std::make_unique<Circle>(0.0, 1.0, 3.0));
-	v2.objects.emplace_back(std::make_unique<Circle>(10.0, 1.0, 3.0));
-	v2.objects.emplace_back(std::make_unique<Rectangle>(5.0, 4.0, 10.0, 6.0));
-
-	Vehicle v3;
-	v3.SetName("C");
-	v3.objects.emplace_back(std::make_unique<Circle>(0.0, 10.0, 3.0));
-	v3.objects.emplace_back(std::make_unique<Circle>(10.0, 10.0, 3.0));
-	v3.objects.emplace_back(std::make_unique<Rectangle>(5.0, 13.0, 10.0, 6.0));
-
-	Vehicle v4;
-	v4.SetName("D");
-	v4.objects.emplace_back(std::make_unique<Circle>(0.0, 0.0, 100.0));
-
-	Vehicle v5;
-	v5.SetName("E");
-	v5.objects.emplace_back(std::make_unique<Rectangle>(0.0, 0.0, 100.0, 100.0));
+	v2.objects.emplace_back(std::make_unique<Circle>(0.0, 0.0, 3.0));
 
 	std::vector<std::unique_ptr<Shape>> shapes;
 	shapes.emplace_back(std::move(&v1));
 	shapes.emplace_back(std::move(&v2));
-	shapes.emplace_back(std::move(&v3));
-	shapes.emplace_back(std::move(&v4));
-	shapes.emplace_back(std::move(&v5));
+
+	//Vehicle v1;
+	//v1.SetName("A");
+	//v1.objects.emplace_back(std::make_unique<Circle>(0.0, 0.0, 3.0));
+	//v1.objects.emplace_back(std::make_unique<Circle>(10.0, 0.0, 3.0));
+	//v1.objects.emplace_back(std::make_unique<Rectangle>(5.0, 3.0, 10.0, 6.0));
+
+	//Vehicle v2;
+	//v2.SetName("B");
+	//v2.objects.emplace_back(std::make_unique<Circle>(0.0, 1.0, 3.0));
+	//v2.objects.emplace_back(std::make_unique<Circle>(10.0, 1.0, 3.0));
+	//v2.objects.emplace_back(std::make_unique<Rectangle>(5.0, 4.0, 10.0, 6.0));
+
+	//Vehicle v3;
+	//v3.SetName("C");
+	//v3.objects.emplace_back(std::make_unique<Circle>(0.0, 10.0, 3.0));
+	//v3.objects.emplace_back(std::make_unique<Circle>(10.0, 10.0, 3.0));
+	//v3.objects.emplace_back(std::make_unique<Rectangle>(5.0, 13.0, 10.0, 6.0));
+
+	//Vehicle v4;
+	//v4.SetName("D");
+	//v4.objects.emplace_back(std::make_unique<Circle>(0.0, 0.0, 100.0));
+
+	//Vehicle v5;
+	//v5.SetName("E");
+	//v5.objects.emplace_back(std::make_unique<Rectangle>(0.0, 0.0, 100.0, 100.0));
+
+	//std::vector<std::unique_ptr<Shape>> shapes;
+	//shapes.emplace_back(std::move(&v1));
+	//shapes.emplace_back(std::move(&v2));
+	//shapes.emplace_back(std::move(&v3));
+	//shapes.emplace_back(std::move(&v4));
+	//shapes.emplace_back(std::move(&v5));
 
 	auto result = get_intersections(shapes);
 
@@ -278,7 +291,7 @@ int main()
 		std::cout << r.first << " intersects with " << r.second << std::endl;
 	}
 
-	assert(result.size() == 8);
+	//assert(result.size() == 8);
 	//bool result = v1.intersect(&v2);
 
 	//std::cout << ((result == true) ? "true" : "false") << std::endl;

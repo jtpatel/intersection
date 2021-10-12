@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include <assert.h>
 
 const auto sqr = [](auto x) { return x * x; };
 
@@ -255,10 +256,20 @@ int main()
 	v3.objects.emplace_back(std::make_unique<Circle>(10.0, 10.0, 3.0));
 	v3.objects.emplace_back(std::make_unique<Rectangle>(5.0, 13.0, 10.0, 6.0));
 
+	Vehicle v4;
+	v4.SetName("D");
+	v4.objects.emplace_back(std::make_unique<Circle>(0.0, 0.0, 100.0));
+
+	Vehicle v5;
+	v5.SetName("E");
+	v5.objects.emplace_back(std::make_unique<Rectangle>(0.0, 0.0, 100.0, 100.0));
+
 	std::vector<std::unique_ptr<Shape>> shapes;
 	shapes.emplace_back(std::move(&v1));
 	shapes.emplace_back(std::move(&v2));
 	shapes.emplace_back(std::move(&v3));
+	shapes.emplace_back(std::move(&v4));
+	shapes.emplace_back(std::move(&v5));
 
 	auto result = get_intersections(shapes);
 
@@ -267,6 +278,7 @@ int main()
 		std::cout << r.first << " intersects with " << r.second << std::endl;
 	}
 
+	assert(result.size() == 8);
 	//bool result = v1.intersect(&v2);
 
 	//std::cout << ((result == true) ? "true" : "false") << std::endl;

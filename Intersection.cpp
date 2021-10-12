@@ -58,7 +58,7 @@ bool CheckIntersection(Circle* icircle1, Circle* icircle2)
 	if (sqr(icircle1->GetX() - icircle2->GetX()) + sqr(icircle1->GetY() - icircle2->GetY())
 		< sqr(icircle1->GetRadius() + icircle2->GetRadius()))
 		return true;
-	
+
 	return false;
 }
 
@@ -69,7 +69,7 @@ bool CheckIntersection(Rectangle * irect1, Rectangle * irect2)
 	if (std::abs(irect1->GetX() - irect2->GetX()) < max_distance_width
 		&& std::abs(irect1->GetY() - irect2->GetY()) < max_distance_height)
 		return true;
-	
+
 	return false;
 }
 
@@ -126,70 +126,97 @@ bool CheckIntersection(Circle * icircle, Rectangle * irect)
 	return false;
 }
 
-
-bool Circle::intersect(Shape * target)
+bool CheckCollision(Shape * subject, Shape * target)
 {
-	//between circle - circle
+	Circle* subAsCircle = dynamic_cast<Circle*>(subject);
+	Rectangle* subAsRect = dynamic_cast<Rectangle*>(subject);
+	Vehicle* subAsVehicle = dynamic_cast<Vehicle*>(subject);
+
 	Circle* tarAsCircle = dynamic_cast<Circle*>(target);
-	if (tarAsCircle)
+	Rectangle* tarAsRect = dynamic_cast<Rectangle*>(target);
+	Vehicle* tarAsVehicle = dynamic_cast<Vehicle*>(target);
+
+	//between circle - circle
+	if (subAsCircle && tarAsCircle)
 	{
-		return CheckIntersection(this, tarAsCircle);
+		return CheckIntersection(subAsCircle, tarAsCircle);
+	}
+
+	//between rectangle - rectangle
+	if (subAsRect && tarAsRect)
+	{
+		return CheckIntersection(subAsRect, tarAsRect);
+	}
+
+	//between rectangle - circle
+	if (subAsRect && tarAsCircle)
+	{
+		return CheckIntersection(tarAsCircle, subAsRect);
 	}
 
 	//between circle - rectangle
-	Rectangle* tarAsRect = dynamic_cast<Rectangle*>(target);
-	if (tarAsRect)
+	if (subAsCircle && tarAsRect)
 	{
-		return CheckIntersection(this, tarAsRect);
+		return CheckIntersection(subAsCircle, tarAsRect);
 	}
 
 	//between circle - Vehicle
-	Vehicle* tarAsVehicle = dynamic_cast<Vehicle*>(target);
-	if (tarAsVehicle)
+	if (subAsCircle && tarAsVehicle)
 	{
-		//check circle Vehicle intersects
 		for (int i = 0; i < tarAsVehicle->objects.size(); i++)
-			if (this->intersect(tarAsVehicle->objects.at(i).get()))
+			if (subAsCircle->intersect(tarAsVehicle->objects.at(i).get()))
 				return true;
 	}
+
+	//between Vehicle - circle
+	if (subAsVehicle && tarAsCircle)
+	{
+		for (int i = 0; i < subAsVehicle->objects.size(); i++)
+			if (tarAsCircle->intersect(subAsVehicle->objects.at(i).get()))
+				return true;
+	}
+
+	//between rectangle - Vehicle
+	if (subAsRect && tarAsVehicle)
+	{
+		for (int i = 0; i < tarAsVehicle->objects.size(); i++)
+			if (subAsRect->intersect(tarAsVehicle->objects.at(i).get()))
+				return true;
+	}
+
+	//between Vehicle - rectangle
+	if (subAsVehicle && tarAsRect)
+	{
+		for (int i = 0; i < subAsVehicle->objects.size(); i++)
+			if (tarAsRect->intersect(subAsVehicle->objects.at(i).get()))
+				return true;
+	}
+
+	//between Vehicle - Vehicle
+	if (subAsVehicle && tarAsVehicle)
+	{
+		for (const auto& s : subAsVehicle->objects)
+			for (const auto& t : tarAsVehicle->objects)
+				if (s->intersect(t.get()))
+					return true;
+	}
+
 	return false;
+}
+
+bool Circle::intersect(Shape * target)
+{
+	return CheckCollision(this, target);
 }
 
 bool Rectangle::intersect(Shape * target)
 {
-	//between rectangle - circle
-	Circle* tarAsCircle = dynamic_cast<Circle*>(target);
-	if (tarAsCircle)
-	{
-		return CheckIntersection(tarAsCircle, this);
-	}
-
-	//between rectangle - rectangle
-	Rectangle* tarAsRect = dynamic_cast<Rectangle*>(target);
-	if (tarAsRect)
-	{
-		return CheckIntersection(this, tarAsRect);
-	}
-
-	//between rectangle - Vehicle
-	Vehicle* tarAsVehicle = dynamic_cast<Vehicle*>(target);
-	if (tarAsVehicle)
-	{
-		//check rectangle Vehicle intersects
-		for (int i = 0; i < tarAsVehicle->objects.size(); i++)
-			if (this->intersect(tarAsVehicle->objects.at(i).get()))
-				return true;
-	}
-	return false;
+	return CheckCollision(this, target);
 }
 
 bool Vehicle::intersect(Shape * target)
 {
-	for (int i = 0; i < objects.size(); i++)
-	{
-		if (objects.at(i)->intersect(target))
-			return true;
-	}
+	return CheckCollision(this, target);
 }
 
 int main()
@@ -200,9 +227,9 @@ int main()
 	v1.objects.emplace_back(new Rectangle(5.0, 3.0, 10.0, 6.0));
 
 	Vehicle v2{ "B" };
-	v2.objects.emplace_back(new Circle(0.0, 25.0, 3.0));
-	v2.objects.emplace_back(new Circle(10.0, 25.0, 3.0));
-	v2.objects.emplace_back(new Rectangle(5.0, 28.0, 10.0, 6.0));
+	v2.objects.emplace_back(new Circle(0.0, 10.0, 3.0));
+	v2.objects.emplace_back(new Circle(10.0, 10.0, 3.0));
+	v2.objects.emplace_back(new Rectangle(5.0, 13.0, 10.0, 6.0));
 
 	bool result = v1.intersect(&v2);
 

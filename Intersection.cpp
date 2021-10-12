@@ -8,9 +8,14 @@ const auto sqr = [](auto x) { return x * x; };
 
 class Shape
 {
+protected:
+	std::string m_Name = "";
 public:
 	virtual bool intersect(Shape* target) = 0;
 	virtual ~Shape() {}
+
+	void SetName(const std::string& name) { m_Name = name; }
+	std::string GetName() { return m_Name; }
 };
 
 class Circle : public Shape
@@ -19,7 +24,7 @@ class Circle : public Shape
 	double m_Y = 0.0;
 	double m_Radius = 0.0;
 public:
-	Circle(double X, double Y, double Radius) :m_X{ X }, m_Y{ Y }, m_Radius{ Radius }{}
+	Circle(double X, double Y, double Radius) : m_X{ X }, m_Y{ Y }, m_Radius{ Radius }{}
 	~Circle() {}
 	bool intersect(Shape* target);
 	double GetX() { return m_X; }
@@ -45,10 +50,9 @@ public:
 
 class Vehicle : public Shape
 {
-	std::string m_Name = "";
 public:
 	std::vector<std::unique_ptr<Shape>> objects;// use smart pts
-	Vehicle(const std::string& name) : m_Name{ name } {}
+	Vehicle() {}
 	~Vehicle() {}
 	bool intersect(Shape* target);
 };
@@ -219,21 +223,53 @@ bool Vehicle::intersect(Shape * target)
 	return CheckCollision(this, target);
 }
 
+auto get_intersections(std::vector<std::unique_ptr<Shape>> & shapes)
+{
+	auto result = std::vector<std::pair<std::string, std::string>>{};
+
+	for (int s = 0; s < shapes.size(); s++)
+		for (int t = s + 1; t < shapes.size(); t++)
+			if (shapes.at(s)->intersect(shapes.at(t).get()))
+				result.emplace_back(shapes.at(s)->GetName(), shapes.at(t)->GetName());
+
+	return result;
+}
+
 int main()
 {
-	Vehicle v1{ "A" };
+	Vehicle v1;
+	v1.SetName("A");
 	v1.objects.emplace_back(std::make_unique<Circle>(0.0, 0.0, 3.0));
 	v1.objects.emplace_back(std::make_unique<Circle>(10.0, 0.0, 3.0));
 	v1.objects.emplace_back(std::make_unique<Rectangle>(5.0, 3.0, 10.0, 6.0));
 
-	Vehicle v2{ "B" };
-	v2.objects.emplace_back(std::make_unique<Circle>(0.0, 10.0, 3.0));
-	v2.objects.emplace_back(std::make_unique<Circle>(10.0, 10.0, 3.0));
-	v2.objects.emplace_back(std::make_unique<Rectangle>(5.0, 13.0, 10.0, 6.0));
+	Vehicle v2;
+	v2.SetName("B");
+	v2.objects.emplace_back(std::make_unique<Circle>(0.0, 1.0, 3.0));
+	v2.objects.emplace_back(std::make_unique<Circle>(10.0, 1.0, 3.0));
+	v2.objects.emplace_back(std::make_unique<Rectangle>(5.0, 4.0, 10.0, 6.0));
 
-	bool result = v1.intersect(&v2);
+	Vehicle v3;
+	v3.SetName("C");
+	v3.objects.emplace_back(std::make_unique<Circle>(0.0, 10.0, 3.0));
+	v3.objects.emplace_back(std::make_unique<Circle>(10.0, 10.0, 3.0));
+	v3.objects.emplace_back(std::make_unique<Rectangle>(5.0, 13.0, 10.0, 6.0));
 
-	std::cout << ((result == true) ? "true" : "false") << std::endl;
+	std::vector<std::unique_ptr<Shape>> shapes;
+	shapes.emplace_back(std::move(&v1));
+	shapes.emplace_back(std::move(&v2));
+	shapes.emplace_back(std::move(&v3));
+
+	auto result = get_intersections(shapes);
+
+	for (auto r : result)
+	{
+		std::cout << r.first << " intersects with " << r.second << std::endl;
+	}
+
+	//bool result = v1.intersect(&v2);
+
+	//std::cout << ((result == true) ? "true" : "false") << std::endl;
 
 	getchar();
 }
